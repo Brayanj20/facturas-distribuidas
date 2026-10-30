@@ -1,0 +1,32 @@
+sequenceDiagram
+    autonumber
+    actor U as Usuario
+    participant P as ProxyCoordinador
+    participant C as Coordinador (Mediator)
+    participant B as BusEventos
+    participant W1 as Worker 1
+    participant H as Hilo del pool (W1)
+    participant W2 as Worker 2
+    U->>P: enviar_facturas(lote)
+    P->>C: {tipo: enviar, trabajos[]} (TCP)
+    C->>B: publicar(trabajos_recibidos)
+    loop Despachador: mientras haya pendientes y capacidad libre
+        C->>W1: {tipo: trabajos, trabajos[k]} (lote)
+        C->>W2: {tipo: trabajos, trabajos[k]}
+    end
+    par Procesamiento concurrente en W1
+        W1->>H: pool.submit(procesar_factura)
+        H-->>W1: resultado (válida / rechazada)
+    and Latidos
+        W1-)C: {tipo: latido} cada 0,5 s
+    end
+    W1->>C: {tipo: resultados, resultados[]}
+    C->>C: guardar en SQLite
+    C->>B: publicar(trabajos_completados)
+    C->>P: {tipo: resultados}
+    alt Worker 2 deja de enviar latidos (> 1,5 s)
+        C->>B: publicar(worker_caido)
+        C->>C: reencolar trabajos en curso de W2
+        C->>W1: {tipo: trabajos} (reasignados)
+    end
+    P-->>U: esperar() retorna resultados

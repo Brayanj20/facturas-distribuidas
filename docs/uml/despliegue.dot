@@ -1,0 +1,20 @@
+digraph G {
+  rankdir=TB; fontname="Helvetica"; node [fontname="Helvetica", fontsize=11]; edge [fontname="Helvetica", fontsize=10];
+  label="Diagrama de despliegue"; labelloc=t; fontsize=14; compound=true; nodesep=0.5;
+  node [shape=box3d, style=filled, fillcolor="#E8EEF9", color="#1F3A93"];
+  subgraph cluster_c { label="«device» Equipo cliente\n«execution environment» Python 3.10+"; style="filled"; fillcolor="#F7F7F7"; color="#1F3A93";
+    c1 [label="«artifact»\ncliente.py\n(ProxyCoordinador)", shape=note, fillcolor="#FFFFFF"]; }
+  subgraph cluster_s { label="«device» Servidor coordinador\n«execution environment» Python 3.10+ – puerto TCP 5000"; style="filled"; fillcolor="#F7F7F7"; color="#1F3A93";
+    s1 [label="«artifact»\ncoordinador.py", shape=note, fillcolor="#FFFFFF"]; s2 [label="«artifact»\nresultados.db\n(SQLite)", shape=cylinder, fillcolor="#FFFFFF"]; }
+  subgraph cluster_w1 { label="«device» Nodo worker 1\nPython 3.10+\n8 hilos"; style="filled"; fillcolor="#F7F7F7"; color="#1F3A93";
+    w1 [label="«artifact»\nworker.py", shape=note, fillcolor="#FFFFFF"]; }
+  subgraph cluster_w2 { label="«device» Nodo worker 2\nPython 3.10+\n8 hilos"; style="filled"; fillcolor="#F7F7F7"; color="#1F3A93";
+    w2 [label="«artifact»\nworker.py", shape=note, fillcolor="#FFFFFF"]; }
+  subgraph cluster_wn { label="«device» Nodo worker N\nPython 3.10+\n8 hilos"; style="filled"; fillcolor="#F7F7F7"; color="#1F3A93";
+    wn [label="«artifact»\nworker.py", shape=note, fillcolor="#FFFFFF"]; }
+  c1 -> s1 [label="«TCP/IP» JSON\nenviar / resultados", dir=both];
+  s1 -> s2 [label="SQL"];
+  s1 -> w1 [label="«TCP/IP» trabajos\nresultados + latidos", dir=both];
+  s1 -> w2 [label="«TCP/IP»", dir=both];
+  s1 -> wn [label="«TCP/IP»", dir=both];
+}

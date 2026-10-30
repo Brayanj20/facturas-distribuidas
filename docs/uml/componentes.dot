@@ -1,0 +1,22 @@
+digraph G {
+  rankdir=LR; fontname="Helvetica"; node [fontname="Helvetica", fontsize=11]; edge [fontname="Helvetica", fontsize=9];
+  label="Diagrama de componentes – Sistema distribuido de procesamiento de facturas"; labelloc=t; fontsize=14;
+  node [shape=component, style=filled, fillcolor="#E8EEF9", color="#1F3A93"];
+  subgraph cluster_cli { label="«subsistema» Cliente"; style=rounded; color="#888888";
+    App [label="AplicacionCliente\n(cliente.py)"]; Proxy [label="«proxy»\nProxyCoordinador"]; }
+  subgraph cluster_coord { label="«subsistema» Nodo coordinador"; style=rounded; color="#888888";
+    Med [label="«mediator»\nCoordinador"]; Desp [label="Despachador\n(hilo)"]; Vig [label="VigilanteLatidos\n(hilo)"];
+    Bus [label="«subject»\nBusEventos"]; Log [label="«observer»\nRegistroConsola"]; Met [label="«observer»\nMonitorMetricas"];
+    Repo [label="RepositorioResultados\n(SQLite)"]; }
+  subgraph cluster_w { label="«subsistema» Nodo worker (×N)"; style=rounded; color="#888888";
+    W [label="Worker"]; Pool [label="ThreadPoolExecutor\n(pool de hilos)"]; Proc [label="ProcesadorFacturas\n(factura.py)"]; Emi [label="Emisor de resultados\n(hilo)"]; Lat [label="Emisor de latidos\n(hilo)"]; }
+  Prot [label="Protocolo\n(JSON + longitud / TCP)", fillcolor="#FFF4C2"];
+  App -> Proxy [label="enviar_facturas()\nesperar()"];
+  Proxy -> Med [label="ITrabajos (TCP)", dir=both, arrowtail=dot];
+  Med -> Desp [arrowhead=diamond, dir=back]; Med -> Vig [arrowhead=diamond, dir=back];
+  Med -> Bus [label="publicar()"]; Bus -> Log [label="notificar()"]; Bus -> Met [label="notificar()"];
+  Med -> Repo [label="guardar()"];
+  Desp -> W [label="IAsignacion (TCP)"]; W -> Med [label="resultados / latidos", style=dashed];
+  W -> Pool [label="submit()"]; Pool -> Proc [label="procesar_factura()"]; Pool -> Emi [label="cola de salida"]; W -> Lat;
+  {Proxy Med W} -> Prot [style=dotted, arrowhead=open, label="«use»"];
+}
