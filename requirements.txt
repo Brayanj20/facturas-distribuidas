@@ -1,0 +1,3 @@
+# Sistema: solo biblioteca estándar de Python 3.10+
+# Gráficas del benchmark:
+matplotlib>=3.7
