@@ -1,0 +1,4 @@
+workers,facturas,hilos_por_worker,lote,fallo,completadas,ok,tiempo_s,throughput_fps,lat_p50_ms,lat_p95_ms,lat_media_ms,rechazadas,reasignadas,workers_caidos
+4,4000,32,1,ninguno,4000,True,0.823,4860.1,423.7,768.1,427.4,197,0,0
+4,4000,32,8,ninguno,4000,True,0.741,5401.3,392.1,696.5,386.5,197,0,0
+4,4000,32,32,ninguno,4000,True,0.697,5739.7,362.8,653.4,360.6,197,0,0
